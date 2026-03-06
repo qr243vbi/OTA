@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  schedule:
+    # Try a couple of times every Monday
+    - cron: '50 2 * * 2'
+  # Allows manual trigger from GitHub UI
+  workflow_dispatch:
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config user.name "Release Bot"
+          git config user.email "qr243vbi@atomicmail.io"
+
+      - name: Add upstream remote
+        run: git remote add upstream https://github.com/waydroid/OTA.git
+
+      - name: Fetch upstream changes
+        run: git fetch upstream
+
+      - name: Merge upstream changes
+        run: |
+          git checkout master
+          git merge upstream/master --no-edit
+
+      - name: Push changes to fork
+        run: git push origin master
